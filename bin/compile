@@ -213,16 +213,19 @@ source $BIN_DIR/steps/pip-install
 # Django collectstatic support.
 sub-env $BIN_DIR/steps/collectstatic
 
+# Update python shebang on the installed executables
+source $BIN_DIR/steps/update-py-shebang
 
 # Create .profile script for application runtime environment variables.
-set-env PATH '$HOME/.heroku/python/bin:$PATH'
+set-env BASE_PATH '$(cd `dirname $BASH_SOURCE`; pwd -P)/../'
+set-env PATH '$BASE_PATH/.heroku/python/bin:$PATH'
 set-env PYTHONUNBUFFERED true
-set-env PYTHONHOME /app/.heroku/python
-set-env LIBRARY_PATH '/app/.heroku/vendor/lib:/app/.heroku/python/lib:$LIBRARY_PATH'
-set-env LD_LIBRARY_PATH '/app/.heroku/vendor/lib:/app/.heroku/python/lib:$LD_LIBRARY_PATH'
+set-env PYTHONHOME '$BASE_PATH/.heroku/python'
+set-env LIBRARY_PATH '$BASE_PATH/.heroku/vendor/lib:$BASE_PATH/.heroku/python/lib:$LIBRARY_PATH'
+set-env LD_LIBRARY_PATH '$BASE_PATH/.heroku/vendor/lib:$BASE_PATH/.heroku/python/lib:$LD_LIBRARY_PATH'
 set-default-env LANG en_US.UTF-8
 set-default-env PYTHONHASHSEED random
-set-default-env PYTHONPATH /app/
+set-default-env PYTHONPATH '$BASE_PATH'
 
 # Install sane-default script for $WEB_CONCURRENCY and $FORWARDED_ALLOW_IPS.
 cp $ROOT_DIR/vendor/python.gunicorn.sh $GUNICORN_PROFILE_PATH
@@ -267,4 +270,3 @@ if [[ ! "$DOCKER_BUILD" ]]; then
   bpwatch stop anvil_appdir_commit
   bpwatch stop compile
 fi
-

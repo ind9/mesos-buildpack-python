@@ -1,0 +1,9 @@
+# Update python shebang location to pick it from env instead of full path
+puts-cmd "Update python shebang inside .heroku/python/bin/ files"
+
+set -e
+sed -i 's/#!\/app\/.heroku\/python\/bin\/python/#!\/usr\/bin\/env python/' .heroku/python/bin/*
+
+show-warnings
+
+echo
